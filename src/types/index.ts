@@ -12,6 +12,7 @@ export interface User {
   open_source_contributor: boolean;
   tokens_bought: number;
   tokens_planned: number;
+  last_signin:string;
   // Add other user fields as needed
 }
 

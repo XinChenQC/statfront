@@ -88,7 +88,7 @@ export const UsersPage = () => {
       {users.length > 0 && (
         <>
           <UserStatistics users={users} />
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="bg-white rounded-lg shadow overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -100,6 +100,7 @@ export const UsersPage = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Industry</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">VIP</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expertise</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">LastSignIn</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -125,6 +126,7 @@ export const UsersPage = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {user.expertise}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.last_signin?.split('T')[0]}</td>
                   </tr>
                 ))}
               </tbody>
