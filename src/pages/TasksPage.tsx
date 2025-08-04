@@ -3,6 +3,17 @@ import { taskService } from '../api/services';
 import type { Task } from '../types';
 import { PasswordModal } from '../components/PasswordModal';
 
+const getStatusText = (status: number | string): string => {
+  const statusNum = typeof status === 'string' ? parseInt(status) : status;
+  switch (statusNum) {
+    case 0: return 'pending';
+    case 1: return 'computing';
+    case 2: return 'finished';
+    case 3: return 'error';
+    default: return 'unknown';
+  }
+};
+
 export const TasksPage = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -78,8 +89,10 @@ export const TasksPage = () => {
             <thead>
               <tr className="bg-gray-100">
                 <th className="px-6 py-3 border-b text-left">ID</th>
-                <th className="px-6 py-3 border-b text-left">Title</th>
-                <th className="px-6 py-3 border-b text-left">Description</th>
+                <th className="px-6 py-3 border-b text-left">UserID</th>
+                <th className="px-6 py-3 border-b text-left">Email</th>
+                <th className="px-6 py-3 border-b text-left">Created At</th>
+                <th className="px-6 py-3 border-b text-left">Cost</th>
                 <th className="px-6 py-3 border-b text-left">Status</th>
               </tr>
             </thead>
@@ -87,9 +100,11 @@ export const TasksPage = () => {
               {tasks.map((task) => (
                 <tr key={task.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 border-b">{task.id}</td>
-                  <td className="px-6 py-4 border-b">{task.title}</td>
-                  <td className="px-6 py-4 border-b">{task.description}</td>
-                  <td className="px-6 py-4 border-b">{task.status}</td>
+                  <td className="px-6 py-4 border-b">{task.user_id}</td>
+                  <td className="px-6 py-4 border-b">{task.user_email}</td>
+                  <td className="px-6 py-4 border-b">{new Date(task.created_at).toLocaleDateString()}</td>
+                  <td className="px-6 py-4 border-b">{Number(task.token_used).toFixed(2)}</td>
+                  <td className="px-6 py-4 border-b">{getStatusText(task.status)}</td>
                 </tr>
               ))}
             </tbody>

@@ -4,6 +4,44 @@ import type { User } from '../types';
 import { PasswordModal } from '../components/PasswordModal';
 import { UserStatistics } from '../components/UserStatistics';
 
+interface TruncatedTextProps {
+  text: string;
+  maxLength?: number;
+  className?: string;
+}
+
+const TruncatedText = ({ text, maxLength = 20, className = '' }: TruncatedTextProps) => {
+  const [showTooltip, setShowTooltip] = useState(false);
+  
+  if (!text) return <span className={className}>-</span>;
+  
+  const shouldTruncate = text.length > maxLength;
+  const displayText = shouldTruncate ? `${text.slice(0, maxLength)}...` : text;
+  
+  if (!shouldTruncate) {
+    return <span className={className}>{text}</span>;
+  }
+  
+  return (
+    <div className="relative inline-block">
+      <span
+        className={`cursor-help ${className}`}
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+      >
+        {displayText}
+      </span>
+      
+      {showTooltip && (
+        <div className="absolute z-50 px-3 py-2 text-sm text-white bg-gray-900 rounded-lg shadow-lg bottom-full left-1/2 transform -translate-x-1/2 mb-2 max-w-sm break-words whitespace-normal">
+          {text}
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const UsersPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
@@ -100,6 +138,7 @@ export const UsersPage = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Industry</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">VIP</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expertise</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tokens Planned</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">LastSignIn</th>
                 </tr>
               </thead>
@@ -113,18 +152,29 @@ export const UsersPage = () => {
                     >
                       {formatId(user.id)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.username}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.country}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <TruncatedText text={user.username} maxLength={15} />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <TruncatedText text={user.email} maxLength={25} />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <TruncatedText text={user.country} maxLength={12} />
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(user.created_at).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.industry}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <TruncatedText text={user.industry} maxLength={15} />
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {user.vip ? 'Yes' : 'No'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {user.expertise}
+                      <TruncatedText text={user.expertise} maxLength={20} />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {user.tokens_planned?.toString() || '0'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.last_signin?.split('T')[0]}</td>
                   </tr>

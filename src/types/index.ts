@@ -18,8 +18,11 @@ export interface User {
 
 export interface Task {
   id: number;
-  title: string;
+  user_id: string;
+  user_email: string;
+  created_at: string;
   description: string;
+  token_used: number;
   status: string;
   // Add other task fields as needed
 }

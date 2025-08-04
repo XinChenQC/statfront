@@ -17,6 +17,8 @@ export const userService = {
 export const taskService = {
   getTasks: async (password: string): Promise<ApiResponse<Task>> => {
     const response = await api.post<ApiResponse<Task>>('/api/tasks', { password });
+    
+    console.log(response.data);
     return response.data;
   },
   downloadTasks: async (password: string): Promise<Blob> => {
