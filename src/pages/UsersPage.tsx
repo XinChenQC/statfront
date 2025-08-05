@@ -42,11 +42,16 @@ const TruncatedText = ({ text, maxLength = 20, className = '' }: TruncatedTextPr
   );
 };
 
+type SortField = 'created_at' | 'last_signin';
+type SortDirection = 'asc' | 'desc';
+
 export const UsersPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState<'view' | 'download'>('view');
+  const [sortField, setSortField] = useState<SortField | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   const handleViewUsers = async (password: string) => {
     try {
@@ -89,6 +94,64 @@ export const UsersPage = () => {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
+  };
+
+/* Sort functionality */
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      // Toggle direction if same field
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new field with ascending direction
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const getSortedUsers = () => {
+    if (!sortField) return users;
+
+    return [...users].sort((a, b) => {
+      let aValue: string | Date;
+      let bValue: string | Date;
+
+      if (sortField === 'created_at') {
+        aValue = new Date(a.created_at);
+        bValue = new Date(b.created_at);
+      } else {
+        // last_signin
+        aValue = a.last_signin ? new Date(a.last_signin) : new Date(0);
+        bValue = b.last_signin ? new Date(b.last_signin) : new Date(0);
+      }
+
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  };
+
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) {
+      return (
+        <svg className="w-4 h-4 ml-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+        </svg>
+      );
+    }
+
+    if (sortDirection === 'asc') {
+      return (
+        <svg className="w-4 h-4 ml-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+        </svg>
+      );
+    } else {
+      return (
+        <svg className="w-4 h-4 ml-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      );
+    }
   };
 
   return (
@@ -134,16 +197,32 @@ export const UsersPage = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                    onClick={() => handleSort('created_at')}
+                  >
+                    <div className="flex items-center">
+                      Created At
+                      {getSortIcon('created_at')}
+                    </div>
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Industry</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">VIP</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expertise</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tokens Planned</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">LastSignIn</th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                    onClick={() => handleSort('last_signin')}
+                  >
+                    <div className="flex items-center">
+                      LastSignIn
+                      {getSortIcon('last_signin')}
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {users.map((user) => (
+                {getSortedUsers().map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50">
                     <td 
                       className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 cursor-pointer"
@@ -155,7 +234,10 @@ export const UsersPage = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <TruncatedText text={user.username} maxLength={15} />
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer"
+                        onClick={() => copyToClipboard(user.email)}
+                        title="Click to copy full Email"
+                    >
                       <TruncatedText text={user.email} maxLength={25} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
