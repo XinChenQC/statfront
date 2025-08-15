@@ -19,6 +19,12 @@ export const TasksPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'view' | 'download'>('view');
+  
+  // Bloked email list
+  const blockedEmails = ['chenxin199261@gmail.com'];
+  
+  // Filter out tasks with blocked emails
+  const filteredTasks = tasks.filter(task => !blockedEmails.includes(task.user_email));
 
   const handleViewTasks = async (password: string) => {
     try {
@@ -97,7 +103,7 @@ export const TasksPage = () => {
               </tr>
             </thead>
             <tbody>
-              {tasks.map((task) => (
+              {filteredTasks.map((task) => (
                 <tr key={task.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 border-b">{task.id}</td>
                   <td className="px-6 py-4 border-b">{task.user_id}</td>
