@@ -31,4 +31,15 @@ export interface ApiResponse<T> {
   data: T[];
   message: string;
   status: 'success' | 'error';
-} 
+}
+
+export interface WorkflowRequest {
+  password: string;
+  task_id: string;
+}
+
+export interface WorkflowResponse {
+  workflow: Record<string, any>;
+  message: string;
+  status: string;
+}

@@ -1,5 +1,5 @@
 import api from './axios';
-import type { ApiResponse, User, Task } from '../types';
+import type { ApiResponse, User, Task, WorkflowRequest, WorkflowResponse } from '../types';
 
 export const userService = {
   getUsers: async (password: string): Promise<ApiResponse<User>> => {
@@ -27,4 +27,14 @@ export const taskService = {
     });
     return response.data;
   }
-}; 
+};
+
+export const workflowService = {
+  getWorkflow: async (password: string, taskId: string): Promise<WorkflowResponse> => {
+    const response = await api.post<WorkflowResponse>('/api/workflow', {
+      password,
+      task_id: taskId
+    });
+    return response.data;
+  }
+};
