@@ -13,6 +13,8 @@ export interface User {
   tokens_bought: number;
   tokens_planned: number;
   last_signin:string;
+  organization: string;
+  frequency: string;
   // Add other user fields as needed
 }
 
